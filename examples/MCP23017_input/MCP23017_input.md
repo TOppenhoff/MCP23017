@@ -6,7 +6,7 @@ It shows you how to use a pin as input and how to use a pin as output
 
 ## Purpose
 
-This example will cycle 4 LEDs through various brightness levels
+The fancy art of turning a LED on and off
 
 ## Schematic
 
