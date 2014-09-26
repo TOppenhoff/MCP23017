@@ -83,6 +83,64 @@ MCP23017::Pin::Pin()
   _state = MCP23017_PINSTATE_MODE; // default on chip is input
 }
 
+uint8_t MCP23017::Pin::getPinMode() const
+{
+  if ((_state & MCP23017_PINSTATE_MODE) == MCP23017_PINSTATE_MODE)
+  {
+    if ((_state & MCP23017_PINSTATE_PULLUP) == MCP23017_PINSTATE_PULLUP)
+    {
+      return INPUT_PULLUP;
+    }
+    return INPUT;
+  }
+
+  return OUTPUT;
+}
+
+void MCP23017::Pin::setPinMode(uint8_t mode)
+{
+  if (mode == INPUT_PULLUP)
+  {
+    _state |= MCP23017_PINSTATE_MODE;
+    _state |= MCP23017_PINSTATE_PULLUP;
+  }
+  else if (mode == INPUT)
+  {
+    _state |= MCP23017_PINSTATE_MODE;
+    _state &= ~MCP23017_PINSTATE_PULLUP;
+  }
+  else
+  {
+    _state &= ~MCP23017_PINSTATE_MODE;
+    _state &= ~MCP23017_PINSTATE_PULLUP;
+  }
+}
+
+uint8_t MCP23017::Pin::getInterrupt() const
+{
+  if ((_state & MCP23017_PINSTATE_INTERRUPT_ENABLED) == MCP23017_PINSTATE_INTERRUPT_ENABLED)
+  {
+    // interrupt enabled
+    if ((_state & MCP23017_PINSTATE_INTERRUPT_CHANGE) == MCP23017_PINSTATE_INTERRUPT_CHANGE)
+    {
+      // value from default register
+      if ((_state & MCP23017_PINSTATE_INTERRUPT_VALUE) == MCP23017_PINSTATE_INTERRUPT_VALUE)
+      {
+        // falling interrupt
+        return FALLING;
+      }
+      // rising interrupt
+      return RISING;
+    }
+
+    // on change interrupt
+    return CHANGE;
+  }
+
+  // no interrupt
+  return 0x0;
+}
+
 void MCP23017::Pin::setInterrupt(uint8_t interrupt)
 {
   if (interrupt == CHANGE)
@@ -111,6 +169,11 @@ void MCP23017::Pin::setInterrupt(uint8_t interrupt)
   }
 }
 
+bool MCP23017::Pin::getPolarityInvert() const
+{
+  return (_state & MCP23017_PINSTATE_POLARITY) == MCP23017_PINSTATE_POLARITY;
+}
+
 void MCP23017::Pin::setPolarityInvert(bool polarityInvert)
 {
   if (polarityInvert)
@@ -121,6 +184,15 @@ void MCP23017::Pin::setPolarityInvert(bool polarityInvert)
   {
     _state &= ~MCP23017_PINSTATE_POLARITY;
   }
+}
+
+uint8_t MCP23017::Pin::getValue() const
+{
+  if ((_state & MCP23017_PINSTATE_VALUE) == MCP23017_PINSTATE_VALUE)
+  {
+    return HIGH;
+  }
+  return LOW;
 }
 
 void MCP23017::Pin::setValue(uint8_t value)
@@ -137,59 +209,6 @@ void MCP23017::Pin::setValue(uint8_t value)
       _state &= ~MCP23017_PINSTATE_VALUE;
     }
   }
-}
-
-uint8_t MCP23017::Pin::getPinMode() const
-{
-  if ((_state & MCP23017_PINSTATE_MODE) == MCP23017_PINSTATE_MODE)
-  {
-    if ((_state & MCP23017_PINSTATE_PULLUP) == MCP23017_PINSTATE_PULLUP)
-    {
-      return INPUT_PULLUP;
-    }
-    return INPUT;
-  }
-
-  return OUTPUT;
-}
-
-uint8_t MCP23017::Pin::getInterrupt() const
-{
-  if ((_state & MCP23017_PINSTATE_INTERRUPT_ENABLED) == MCP23017_PINSTATE_INTERRUPT_ENABLED)
-  {
-    // interrupt enabled
-    if ((_state & MCP23017_PINSTATE_INTERRUPT_CHANGE) == MCP23017_PINSTATE_INTERRUPT_CHANGE)
-    {
-      // value from default register
-      if ((_state & MCP23017_PINSTATE_INTERRUPT_VALUE) == MCP23017_PINSTATE_INTERRUPT_VALUE)
-      {
-        // falling interrupt
-        return FALLING;
-      }
-      // rising interrupt
-      return RISING;
-    }
-
-    // on change interrupt
-    return CHANGE;
-  }
-
-  // no interrupt
-  return 0x0;
-}
-
-bool MCP23017::Pin::getPolarityInvert() const
-{
-  return (_state & MCP23017_PINSTATE_POLARITY) == MCP23017_PINSTATE_POLARITY;
-}
-
-uint8_t MCP23017::Pin::getValue() const
-{
-  if ((_state & MCP23017_PINSTATE_VALUE) == MCP23017_PINSTATE_VALUE)
-  {
-    return HIGH;
-  }
-  return LOW;
 }
 
 MCP23017::MCP23017()
