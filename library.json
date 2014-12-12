@@ -1,6 +1,6 @@
 {
   "name": "MCP23017",
-  "keywords": "io, port, expander, i2c",
+  "keywords": "io, port, expander, i2c, twi",
   "description": "Library for MCP23017 16-Bit I/O(input/output) port expander with interrupt output",
   "authors":
   {
